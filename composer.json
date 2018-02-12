@@ -18,5 +18,8 @@
     },
     "config": {
         "process-timeout": 1800
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.5"
     }
 }

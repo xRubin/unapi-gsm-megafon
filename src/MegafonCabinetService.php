@@ -132,7 +132,7 @@ class MegafonCabinetService implements ServiceInterface, LoggerAwareInterface
                 $this->getLogger()->info($data = $response->getBody()->getContents());
                 $answer = json_decode($data);
                 if (isset($answer->balance))
-                    return new FulfilledPromise((float)$answer->balance);
+                    return new FulfilledPromise($answer);
 
                 throw new MegafonRuntimeException('Balance not found', $response->getStatusCode());
             });
