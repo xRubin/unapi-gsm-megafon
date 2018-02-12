@@ -167,7 +167,30 @@ class MegafonCabinetService implements ServiceInterface, LoggerAwareInterface
                     return new FulfilledPromise($answer->paid);
 
                 throw new MegafonRuntimeException('Paid services not found', $response->getStatusCode());
+            });
+    }
 
+    /**
+     * @param $service
+     * @return PromiseInterface
+     */
+    public function disableService($service): PromiseInterface
+    {
+        return $this->getClient()->requestAsync('DELETE', '/mlk/api/options/' . $service->optionId)
+            ->then(function (ResponseInterface $response) {
+                return new FulfilledPromise(true);
+            });
+    }
+
+    /**
+     * @param $service
+     * @return PromiseInterface
+     */
+    public function enableService($service): PromiseInterface
+    {
+        return $this->getClient()->requestAsync('POST', '/mlk/api/options/' . $service->optionId)
+            ->then(function (ResponseInterface $response) {
+                return new FulfilledPromise(true);
             });
     }
 }
