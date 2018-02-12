@@ -119,4 +119,20 @@ class MegafonCabinetService implements ServiceInterface, LoggerAwareInterface
             return new FulfilledPromise($answer);
         });
     }
+
+    /**
+     * @return PromiseInterface
+     */
+    public function getBalance(): PromiseInterface
+    {
+        return $this->getClient()->requestAsync('GET', '/mlk/api/main/info')
+            ->then(function (ResponseInterface $response) {
+                $this->getLogger()->info($data = $response->getBody()->getContents());
+                $answer = json_decode($data);
+                if (isset($answer->balance))
+                    return new FulfilledPromise((float)$answer->balance);
+
+                throw new MegafonRuntimeException('Balance not found', $response->getStatusCode());
+            });
+    }
 }
