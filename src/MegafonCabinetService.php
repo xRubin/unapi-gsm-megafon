@@ -141,32 +141,13 @@ class MegafonCabinetService implements ServiceInterface, LoggerAwareInterface
     /**
      * @return PromiseInterface
      */
-    public function getFreeServices(): PromiseInterface
+    public function getServices(): PromiseInterface
     {
         return $this->getClient()->requestAsync('GET', '/mlk/api/options/list/current')
             ->then(function (ResponseInterface $response) {
                 $this->getLogger()->info($data = $response->getBody()->getContents());
                 $answer = json_decode($data);
-                if (isset($answer->free))
-                    return new FulfilledPromise($answer->free);
-
-                throw new MegafonRuntimeException('Free services not found', $response->getStatusCode());
-            });
-    }
-
-    /**
-     * @return PromiseInterface
-     */
-    public function getPaidServices(): PromiseInterface
-    {
-        return $this->getClient()->requestAsync('GET', '/mlk/api/options/list/current')
-            ->then(function (ResponseInterface $response) {
-                $this->getLogger()->info($data = $response->getBody()->getContents());
-                $answer = json_decode($data);
-                if (isset($answer->paid))
-                    return new FulfilledPromise($answer->paid);
-
-                throw new MegafonRuntimeException('Paid services not found', $response->getStatusCode());
+                return new FulfilledPromise($answer);
             });
     }
 
