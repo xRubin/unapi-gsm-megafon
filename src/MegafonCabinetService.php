@@ -5,12 +5,14 @@ namespace unapi\gsm\megafon;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Promise\RejectedPromise;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use unapi\anticaptcha\common\AnticaptchaInterface;
 use unapi\anticaptcha\common\dto\CaptchaSolvedInterface;
+use unapi\gsm\megafon\exceptions\MegafonRuntimeException;
 use unapi\interfaces\ServiceInterface;
 use unapi\gsm\megafon\exceptions\MegafonUnathorizedException;
 
@@ -133,6 +135,39 @@ class MegafonCabinetService implements ServiceInterface, LoggerAwareInterface
                     return new FulfilledPromise((float)$answer->balance);
 
                 throw new MegafonRuntimeException('Balance not found', $response->getStatusCode());
+            });
+    }
+
+    /**
+     * @return PromiseInterface
+     */
+    public function getFreeServices(): PromiseInterface
+    {
+        return $this->getClient()->requestAsync('GET', '/mlk/api/options/list/current')
+            ->then(function (ResponseInterface $response) {
+                $this->getLogger()->info($data = $response->getBody()->getContents());
+                $answer = json_decode($data);
+                if (isset($answer->free))
+                    return new FulfilledPromise($answer->free);
+
+                throw new MegafonRuntimeException('Free services not found', $response->getStatusCode());
+            });
+    }
+
+    /**
+     * @return PromiseInterface
+     */
+    public function getPaidServices(): PromiseInterface
+    {
+        return $this->getClient()->requestAsync('GET', '/mlk/api/options/list/current')
+            ->then(function (ResponseInterface $response) {
+                $this->getLogger()->info($data = $response->getBody()->getContents());
+                $answer = json_decode($data);
+                if (isset($answer->paid))
+                    return new FulfilledPromise($answer->paid);
+
+                throw new MegafonRuntimeException('Paid services not found', $response->getStatusCode());
+
             });
     }
 }
