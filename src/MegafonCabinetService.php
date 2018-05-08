@@ -152,26 +152,105 @@ class MegafonCabinetService implements ServiceInterface, LoggerAwareInterface
     }
 
     /**
-     * @param $service
+     * @param string $serviceId
      * @return PromiseInterface
      */
-    public function disableService($service): PromiseInterface
+    public function disableService(string $serviceId): PromiseInterface
     {
-        return $this->getClient()->requestAsync('DELETE', '/mlk/api/options/' . $service->optionId)
-            ->then(function (ResponseInterface $response) {
+        return $this->getClient()->requestAsync('DELETE', '/mlk/api/options/' . $serviceId)
+            ->then(function () {
                 return new FulfilledPromise(true);
             });
     }
 
     /**
-     * @param $service
+     * @param $serviceId
      * @return PromiseInterface
      */
-    public function enableService($service): PromiseInterface
+    public function enableService(string $serviceId): PromiseInterface
     {
-        return $this->getClient()->requestAsync('POST', '/mlk/api/options/' . $service->optionId)
-            ->then(function (ResponseInterface $response) {
+        return $this->getClient()->requestAsync('POST', '/mlk/api/options/' . $serviceId)
+            ->then(function () {
                 return new FulfilledPromise(true);
             });
+    }
+
+    /**
+     * @param string $currentPassword
+     * @param string $newPassword
+     * @return PromiseInterface
+     */
+    public function changePassword(string $currentPassword, string $newPassword): PromiseInterface
+    {
+        return $this->getClient()->requestAsync('POST', '/mlk/api/profile/password', [
+            'form_params' => [
+                'currentPassword' => $currentPassword,
+                'newPassword' => $newPassword,
+            ]
+        ])->then(function (ResponseInterface $response) {
+            $answer = $response->getBody()->getContents();
+            $this->getLogger()->info($answer);
+            $data = json_decode($answer);
+
+            if (isset($data->ok) && $data->ok)
+                return new FulfilledPromise(true);
+
+            if (isset($data->message))
+                return new RejectedPromise($data->message);
+
+            return new RejectedPromise('Unknown error');
+        });
+    }
+
+    /**
+     * @return PromiseInterface
+     */
+    public function getTariffs(): PromiseInterface
+    {
+        return $this->getClient()->requestAsync('GET', '/mlk/api/tariff/list')
+            ->then(function (ResponseInterface $response) {
+                $this->getLogger()->info($data = $response->getBody()->getContents());
+                $answer = json_decode($data);
+                return new FulfilledPromise($answer);
+            });
+    }
+
+    /**
+     * @param string $tariffId
+     * @return PromiseInterface
+     */
+    public function getTariff(string $tariffId): PromiseInterface
+    {
+        return $this->getClient()->requestAsync('GET', '/mlk/api/tariff/' . $tariffId)
+            ->then(function (ResponseInterface $response) {
+                $this->getLogger()->info($data = $response->getBody()->getContents());
+                $answer = json_decode($data);
+                return new FulfilledPromise($answer);
+            });
+    }
+
+    /**
+     * @param string $tariffId
+     * @return PromiseInterface
+     */
+    public function changeTariff(string $tariffId): PromiseInterface
+    {
+        return $this->getClient()->requestAsync('POST', '/mlk/api/tariff/current', [
+            'query' => [
+                'tariffId' => $tariffId,
+            ]
+        ])->then(function (ResponseInterface $response) {
+            $answer = $response->getBody()->getContents();
+            $this->getLogger()->info($answer);
+            $data = json_decode($answer);
+
+            if (isset($data->ok) && $data->ok)
+                return new FulfilledPromise(true);
+
+            if (isset($data->message))
+                return new RejectedPromise($data->message);
+
+            return new RejectedPromise('Unknown error');
+        });
     }
 }
