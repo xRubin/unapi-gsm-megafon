@@ -158,8 +158,8 @@ class MegafonCabinetService implements ServiceInterface, LoggerAwareInterface
     public function disableService(string $serviceId): PromiseInterface
     {
         return $this->getClient()->requestAsync('DELETE', '/mlk/api/options/' . $serviceId)
-            ->then(function () {
-                return new FulfilledPromise(true);
+            ->then(function (ResponseInterface $response) {
+                return new FulfilledPromise($response->getStatusCode() == 200);
             });
     }
 
@@ -170,8 +170,8 @@ class MegafonCabinetService implements ServiceInterface, LoggerAwareInterface
     public function enableService(string $serviceId): PromiseInterface
     {
         return $this->getClient()->requestAsync('POST', '/mlk/api/options/' . $serviceId)
-            ->then(function () {
-                return new FulfilledPromise(true);
+            ->then(function (ResponseInterface $response) {
+                return new FulfilledPromise($response->getStatusCode() == 200);
             });
     }
 
@@ -218,7 +218,7 @@ class MegafonCabinetService implements ServiceInterface, LoggerAwareInterface
      * @param string $tariffId
      * @return PromiseInterface
      */
-    public function getTariff(string $tariffId): PromiseInterface
+    public function getTariff(string $tariffId = 'current'): PromiseInterface
     {
         return $this->getClient()->requestAsync('GET', '/mlk/api/tariff/' . $tariffId)
             ->then(function (ResponseInterface $response) {
