@@ -1,12 +1,12 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use unapi\gsm\megafon\MegafonCabinetClient;
 use unapi\gsm\megafon\MegafonCabinetService;
 use unapi\anticaptcha\common\AnticaptchaInterface;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Handler\MockHandler;
-use PHPUnit\Framework\TestCase;
 
 use function GuzzleHttp\json_encode;
 

@@ -7,8 +7,8 @@
     "require": {
         "php": ">=7.1.0",
         "guzzlehttp/guzzle": "^6.3",
-        "unapi/unapi": "1.1.0",
-        "unapi/anticaptcha-common": "1.3.0",
+        "unapi/unapi": "^1.1.1",
+        "unapi/anticaptcha-common": "^1.3.0",
         "psr/log": "^1.0"
     },
     "autoload" : {

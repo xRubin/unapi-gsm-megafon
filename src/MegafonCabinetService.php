@@ -188,15 +188,14 @@ class MegafonCabinetService implements ServiceInterface, LoggerAwareInterface
                 'newPassword' => $newPassword,
             ]
         ])->then(function (ResponseInterface $response) {
-            $answer = $response->getBody()->getContents();
-            $this->getLogger()->info($answer);
-            $data = json_decode($answer);
+            $this->getLogger()->info($data = $response->getBody()->getContents());
+            $answer = json_decode($data);
 
-            if (isset($data->ok) && $data->ok)
+            if (isset($answer->ok) && $answer->ok)
                 return new FulfilledPromise(true);
 
-            if (isset($data->message))
-                return new RejectedPromise($data->message);
+            if (isset($answer->message))
+                return new RejectedPromise($answer->message);
 
             return new RejectedPromise('Unknown error');
         });
@@ -240,15 +239,14 @@ class MegafonCabinetService implements ServiceInterface, LoggerAwareInterface
                 'tariffId' => $tariffId,
             ]
         ])->then(function (ResponseInterface $response) {
-            $answer = $response->getBody()->getContents();
-            $this->getLogger()->info($answer);
-            $data = json_decode($answer);
+            $this->getLogger()->info($data = $response->getBody()->getContents());
+            $answer = json_decode($data);
 
-            if (isset($data->ok) && $data->ok)
+            if ($response->getStatusCode() === 200)
                 return new FulfilledPromise(true);
 
-            if (isset($data->message))
-                return new RejectedPromise($data->message);
+            if (isset($answer->message))
+                return new RejectedPromise($answer->message);
 
             return new RejectedPromise('Unknown error');
         });
